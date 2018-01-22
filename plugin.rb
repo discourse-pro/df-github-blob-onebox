@@ -76,3 +76,10 @@ class Onebox::Engine::GithubBlobOnebox
 
 end
 
+# 2018-01-22
+Onebox::Engine::GithubBlobOnebox.module_eval do
+    alias_method :core__initialize, :initialize
+    def initialize(link, cache = nil, timeout = nil)
+        core__initialize link, cache, 3600
+    end
+end
