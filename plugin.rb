@@ -16,7 +16,7 @@ after_initialize do
 			args[:invalidate_oneboxes] = true if invalidate_oneboxes.present?
 			args[:cooking_options] = self.cooking_options
 			# 2018-01-23
-			args[:delay_for] = 5.seconds
+			#args[:delay_for] = 5.seconds
 			Jobs.enqueue(:process_post, args)
 			DiscourseEvent.trigger(:after_trigger_post_process, self)
 		end
@@ -115,6 +115,7 @@ class Onebox::Engine::GithubBlobOnebox
 	  # 2018-01-22
 	  # «No traffic limits or throttling»
 	  # https://rawgit.com
+	  # https://github.com/rgrove/rawgit
 	  contents = open("https://cdn.rawgit.com/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout).read
 	  #sleep 1 # 2018-01-22
 
