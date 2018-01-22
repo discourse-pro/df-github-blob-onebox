@@ -111,7 +111,7 @@ class Onebox::Engine::GithubBlobOnebox
 
 	  @file = m[:file]
 	  @lang = Onebox::FileTypeFinder.from_file_name(m[:file])
-	  contents = open("https://raw.github.com/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout).read
+	  contents = open("https://raw.githubusercontent.com/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout).read
 	  sleep 1 # 2018-01-22
 
 	  contents_lines = contents.lines           #get contents lines
