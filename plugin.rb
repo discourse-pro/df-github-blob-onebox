@@ -3,6 +3,32 @@
 # version: 1.0.0
 # authors: Dmitry Fedyuk
 # url: https://discourse.pro
+after_initialize do
+	require 'post'
+	Post.module_eval do
+		# Enqueue post processing for this post
+		def trigger_post_process(bypass_bump = false)
+			args = {
+				post_id: id,
+				bypass_bump: bypass_bump
+			}
+			args[:image_sizes] = image_sizes if image_sizes.present?
+			args[:invalidate_oneboxes] = true if invalidate_oneboxes.present?
+			args[:cooking_options] = self.cooking_options
+			# 2018-01-23
+			args[:delay_for] = 5.seconds
+			Jobs.enqueue(:process_post, args)
+			DiscourseEvent.trigger(:after_trigger_post_process, self)
+		end
+	end
+	# 2018-01-22
+	Onebox::Engine::GithubBlobOnebox.module_eval do
+		alias_method :core__initialize, :initialize
+		def initialize(link, cache = nil, timeout = nil)
+			core__initialize link, cache, 3600
+		end
+	end
+end
 
 # 2016-10-04
 # An example of overriding a standard onebox engine (YouTube): https://github.com/discourse/discourse/tree/master/plugins/lazyYT
@@ -121,12 +147,4 @@ class Onebox::Engine::GithubBlobOnebox
 	end
   end
 
-end
-
-# 2018-01-22
-Onebox::Engine::GithubBlobOnebox.module_eval do
-    alias_method :core__initialize, :initialize
-    def initialize(link, cache = nil, timeout = nil)
-        core__initialize link, cache, 3600
-    end
 end
