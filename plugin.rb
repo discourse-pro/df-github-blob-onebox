@@ -74,6 +74,53 @@ class Onebox::Engine::GithubBlobOnebox
      :truncated          => truncated}
   end
 
+  def raw
+	return @raw if @raw
+
+	m = @url.match(/github\.com\/(?<user>[^\/]+)\/(?<repo>[^\/]+)\/blob\/(?<sha1>[^\/]+)\/(?<file>[^#]+)(#(L(?<from>[^-]*)(-L(?<to>.*))?))?/mi)
+
+	if m
+	  from = /\d+/.match(m[:from])   #get numeric should only match a positive interger
+	  to   = /\d+/.match(m[:to])     #get numeric should only match a positive interger
+
+	  @file = m[:file]
+	  @lang = Onebox::FileTypeFinder.from_file_name(m[:file])
+	  contents = open("https://raw.github.com/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout).read
+	  delay 1 # 2018-01-22
+
+	  contents_lines = contents.lines           #get contents lines
+	  contents_lines_size = contents_lines.size #get number of lines
+
+	  cr = calc_range(m, contents_lines_size)    #calculate the range of lines for output
+	  selected_one_liner = cr[:selected_one_liner] #if url is a one-liner calc_range will return it
+	  from           = cr[:from]
+	  to             = cr[:to]
+	  @truncated     = cr[:truncated]
+	  range_provided = cr[:range_provided]
+	  @cr_results = cr
+
+	  if range_provided       #if a range provided (single line or more)
+		if SHOW_LINE_NUMBER
+		  lines_result = line_number_helper(contents_lines[(from - 1)..(to - 1)], from, selected_one_liner)  #print code with prefix line numbers in case range provided
+		  contents = lines_result[:output]
+		  @selected_lines_array = lines_result[:array]
+		else
+		  contents = contents_lines[(from - 1)..(to - 1)].join()
+		end
+
+	  else
+		contents = contents_lines[(from - 1)..(to - 1)].join()
+	  end
+
+	  if contents.length > MAX_CHARS    #truncate content chars to limits
+		contents = contents[0..MAX_CHARS]
+		@truncated = true
+	  end
+
+	  @raw = contents
+	end
+  end
+
 end
 
 # 2018-01-22
