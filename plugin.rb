@@ -139,16 +139,15 @@ class Onebox::Engine::GithubBlobOnebox
 	  # 1) https://developer.github.com/changes/2014-04-25-user-content-security
 	  # 2) «`raw.github.com` does not redirect to `raw.githubusercontent.com` for me»:
 	  # https://github.com/processing/processing-docs/issues/532
-	  # contents = open("https://raw.githubusercontent.com/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout).read
-	  # 2018-01-23
-	  # «No traffic limits or throttling»
+	  # 3) «No traffic limits or throttling»
 	  # https://rawgit.com
 	  # https://github.com/rgrove/rawgit
-	  io = open("https://cdn.rawgit.com/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout)
+	  cdnRawGit = 'cdn.rawgit.com'
+	  cdnGitHub = 'raw.githubusercontent.com'
+	  io = open("https://#{cdnGitHub}/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout)
 	  contents = io.read
 	  # 2018-01-24 https://stackoverflow.com/a/4795782
 	  io.close
-	  #sleep 1 # 2018-01-22
 
 	  contents_lines = contents.lines           #get contents lines
 	  contents_lines_size = contents_lines.size #get number of lines
