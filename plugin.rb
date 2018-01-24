@@ -1,6 +1,6 @@
 # name: df-github-blob-onebox
 # about: The plugin removes the limitation for the maximum number of code lines of the standard GitHub Blob Onebox.
-# version: 1.0.0
+# version: 2.0.0
 # authors: Dmitry Fedyuk
 # url: https://discourse.pro
 Rake::Task.define_task 'df:refresh_oneboxes', [:delay] => :environment do |_, args|
