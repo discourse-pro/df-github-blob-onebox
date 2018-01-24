@@ -56,7 +56,7 @@ end
 
 # 2016-10-04
 # An example of overriding a standard onebox engine (YouTube): https://github.com/discourse/discourse/tree/master/plugins/lazyYT
-# A forum post with an explanation: https://meta.discourse.org/t/12486/4
+# A forum post with an explanation: https://meta.discourse.org/t/42321
 class Onebox::Engine::GithubBlobOnebox
 
   private
