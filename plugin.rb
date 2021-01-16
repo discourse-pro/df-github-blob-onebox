@@ -48,14 +48,14 @@ after_initialize do
 	# 2018-01-22
 	Onebox::Engine::GithubBlobOnebox.module_eval do
 		alias_method :core__initialize, :initialize
-		def initialize(link, cache = nil, timeout = nil)
-			core__initialize link, cache, 3600
+		def initialize(link, timeout = nil)
+			core__initialize link, 3600
 		end
 	end
 end
 
 # 2016-10-04
-# An example of overriding a standard onebox engine (YouTube): https://github.com/discourse/discourse/tree/master/plugins/lazyYT
+# An example of overriding the standard onebox engine: https://github.com/discourse/discourse/blob/v2.0.0/plugins/lazyYT
 # A forum post with an explanation: https://meta.discourse.org/t/42321
 class Onebox::Engine::GithubBlobOnebox
 
