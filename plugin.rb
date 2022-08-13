@@ -57,6 +57,8 @@ end
 # 2016-10-04
 # An example of overriding the standard onebox engine: https://github.com/discourse/discourse/blob/v2.0.0/plugins/lazyYT
 # A forum post with an explanation: https://meta.discourse.org/t/42321
+# 2022-08-14 https://github.com/discourse/discourse/blob/v2.9.0.beta9/plugins/lazy-yt/plugin.rb#L11
+require 'onebox'
 class Onebox::Engine::GithubBlobOnebox
 
   private
