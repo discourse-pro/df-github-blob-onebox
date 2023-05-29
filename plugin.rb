@@ -1,6 +1,6 @@
 # name: df-github-blob-onebox
 # about: The plugin removes the limitation for the maximum number of code lines of the standard GitHub Blob Onebox.
-# version: 2.0.0
+# version: 3.0.0
 # authors: Dmitry Fedyuk
 # url: https://discourse.pro
 Rake::Task.define_task 'df:refresh_oneboxes', [:delay] => :environment do |_, args|
@@ -45,22 +45,20 @@ after_initialize do
 			DiscourseEvent.trigger(:after_trigger_post_process, self)
 		end
 	end
-	# 2018-01-22
-	Onebox::Engine::GithubBlobOnebox.module_eval do
-		alias_method :core__initialize, :initialize
-		def initialize(link, timeout = nil)
-			core__initialize link, 3600
-		end
-	end
 end
 
-# 2016-10-04
-# An example of overriding the standard onebox engine: https://github.com/discourse/discourse/blob/v2.0.0/plugins/lazyYT
-# A forum post with an explanation: https://meta.discourse.org/t/42321
-# 2022-08-14 https://github.com/discourse/discourse/blob/v2.9.0.beta9/plugins/lazy-yt/plugin.rb#L11
-require 'onebox'
-class Onebox::Engine::GithubBlobOnebox
-
+# 2023-05-26
+require 'lib/onebox/mixins/git_blob_onebox'
+Onebox::Engine::GithubBlobOnebox.InstanceMethods.module_eval do
+  # 2018-01-22
+  alias_method :core__initialize, :initialize
+  def initialize(link, timeout = nil)
+    core__initialize link, 3600
+  end
+  # 2016-10-04
+  # An example of overriding the standard onebox engine: https://github.com/discourse/discourse/blob/v2.0.0/plugins/lazyYT
+  # A forum post with an explanation: https://meta.discourse.org/t/42321
+  # 2022-08-14 https://github.com/discourse/discourse/blob/v2.9.0.beta9/plugins/lazy-yt/plugin.rb#L11
   private
   @selected_lines_array  = nil
   @selected_one_liner = 0
@@ -183,5 +181,4 @@ class Onebox::Engine::GithubBlobOnebox
 	  @raw = contents
 	end
   end
-
 end
