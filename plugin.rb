@@ -48,11 +48,8 @@ after_initialize do
 end
 # 2023-05-30
 require './lib/onebox/engine'
-#require './lib/onebox/layout_support'
-#require './lib/onebox/engine/github_blob_onebox'
 require './lib/onebox/mixins/git_blob_onebox'
-class Onebox::Engine::GithubBlobOnebox
-  include Onebox::Mixins::GitBlobOnebox
+module Onebox::Mixins::GitBlobOnebox::InstanceMethods
   # 2018-01-22
   alias_method :core__initialize, :initialize
   def initialize(link, timeout = nil)
