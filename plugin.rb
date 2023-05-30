@@ -47,8 +47,9 @@ after_initialize do
   end
 end
 # 2023-05-30
-require './lib/onebox/layout_support'
-require './lib/onebox/engine/github_blob_onebox'
+require './lib/onebox/engine'
+#require './lib/onebox/layout_support'
+#require './lib/onebox/engine/github_blob_onebox'
 require './lib/onebox/mixins/git_blob_onebox'
 class Onebox::Engine::GithubBlobOnebox
   include Onebox::Mixins::GitBlobOnebox
