@@ -49,7 +49,8 @@ end
 # 2023-05-30
 require './lib/onebox/engine'
 require './lib/onebox/mixins/git_blob_onebox'
-module Onebox::Mixins::GitBlobOnebox::InstanceMethods
+class Onebox::Engine::GithubBlobOnebox
+  include Onebox::Mixins::GitBlobOnebox
   # 2018-01-22
   alias_method :core__initialize, :initialize
   def initialize(link, timeout = nil)
