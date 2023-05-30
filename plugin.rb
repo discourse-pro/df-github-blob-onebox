@@ -44,70 +44,68 @@ after_initialize do
 			Jobs.enqueue(:process_post, args)
 			DiscourseEvent.trigger(:after_trigger_post_process, self)
 		end
-	end
-end
-
-# 2023-05-30
-require './lib/onebox/mixins/git_blob_onebox'
-Onebox::Mixins::GitBlobOnebox::InstanceMethods.module_eval do
-  # 2018-01-22
-  alias_method :core__initialize, :initialize
-  def initialize(link, timeout = nil)
-    core__initialize link, 3600
   end
-  # 2016-10-04
-  # An example of overriding the standard onebox engine: https://github.com/discourse/discourse/blob/v2.0.0/plugins/lazyYT
-  # A forum post with an explanation: https://meta.discourse.org/t/42321
-  # 2022-08-14 https://github.com/discourse/discourse/blob/v2.9.0.beta9/plugins/lazy-yt/plugin.rb#L11
-  private
-  @selected_lines_array  = nil
-  @selected_one_liner = 0
-  def calc_range(m,contents_lines_size)
-    #author Lidlanca  09/15/2014
-    truncated = false
-    from = /\d+/.match(m[:from])             #get numeric should only match a positive interger
-    to   = /\d+/.match(m[:to])               #get numeric should only match a positive interger
-    range_provided = !(from.nil? && to.nil?) #true if "from" or "to" provided in URL
-    from = from.nil? ?  1 : from[0].to_i     #if from not provided default to 1st line
-    to   = to.nil?   ? -1 : to[0].to_i       #if to not provided default to undefiend to be handled later in the logic
-
-    if to === -1 && range_provided   #case "from" exists but no valid "to". aka ONE_LINER
-      one_liner = true
-      to = from
-    else
-      one_liner = false
+  # 2023-05-30
+  require './lib/onebox/mixins/git_blob_onebox'
+  Onebox::Mixins::GitBlobOnebox::InstanceMethods.module_eval do
+    # 2018-01-22
+    alias_method :core__initialize, :initialize
+    def initialize(link, timeout = nil)
+      core__initialize link, 3600
     end
-
-    unless range_provided  #case no range provided default to 1..MAX_LINES
-      from = 1
-      to   = MAX_LINES
-      truncated = true if contents_lines_size > MAX_LINES
-      #we can technically return here
-    end
-
-    from, to = [from,to].sort                                #enforce valid range.  [from < to]
-    from = 1 if from > contents_lines_size                   #if "from" out of TOP bound set to 1st line
-    to   = contents_lines_size if to > contents_lines_size   #if "to" is out of TOP bound set to last line.
-
-    if one_liner
-      @selected_one_liner = from
-      if EXPAND_ONE_LINER != EXPAND_NONE
-        if (EXPAND_ONE_LINER & EXPAND_BEFORE != 0) # check if EXPAND_BEFORE flag is on
-          from = [1, from - LINES_BEFORE].max      # make sure expand before does not go out of bound
-        end
-
-        if (EXPAND_ONE_LINER & EXPAND_AFTER != 0)          # check if EXPAND_FLAG flag is on
-          to = [to + LINES_AFTER, contents_lines_size].min # make sure expand after does not go out of bound
-        end
-
-        from = contents_lines_size if from > contents_lines_size   #if "from" is out of the content top bound
-        # to   = contents_lines_size if to > contents_lines_size   #if "to" is out of  the content top bound
-      else
-        #no expand show the one liner solely
-      end
-    end
-
     # 2016-10-04
+    # An example of overriding the standard onebox engine: https://github.com/discourse/discourse/blob/v2.0.0/plugins/lazyYT
+    # A forum post with an explanation: https://meta.discourse.org/t/42321
+    # 2022-08-14 https://github.com/discourse/discourse/blob/v2.9.0.beta9/plugins/lazy-yt/plugin.rb#L11
+    private
+    @selected_lines_array  = nil
+    @selected_one_liner = 0
+    def calc_range(m,contents_lines_size)
+      #author Lidlanca  09/15/2014
+      truncated = false
+      from = /\d+/.match(m[:from])             #get numeric should only match a positive interger
+      to   = /\d+/.match(m[:to])               #get numeric should only match a positive interger
+      range_provided = !(from.nil? && to.nil?) #true if "from" or "to" provided in URL
+      from = from.nil? ?  1 : from[0].to_i     #if from not provided default to 1st line
+      to   = to.nil?   ? -1 : to[0].to_i       #if to not provided default to undefiend to be handled later in the logic
+
+      if to === -1 && range_provided   #case "from" exists but no valid "to". aka ONE_LINER
+        one_liner = true
+        to = from
+      else
+        one_liner = false
+      end
+
+      unless range_provided  #case no range provided default to 1..MAX_LINES
+        from = 1
+        to   = MAX_LINES
+        truncated = true if contents_lines_size > MAX_LINES
+        #we can technically return here
+      end
+
+      from, to = [from,to].sort                                #enforce valid range.  [from < to]
+      from = 1 if from > contents_lines_size                   #if "from" out of TOP bound set to 1st line
+      to   = contents_lines_size if to > contents_lines_size   #if "to" is out of TOP bound set to last line.
+
+      if one_liner
+        @selected_one_liner = from
+        if EXPAND_ONE_LINER != EXPAND_NONE
+          if (EXPAND_ONE_LINER & EXPAND_BEFORE != 0) # check if EXPAND_BEFORE flag is on
+            from = [1, from - LINES_BEFORE].max      # make sure expand before does not go out of bound
+          end
+
+          if (EXPAND_ONE_LINER & EXPAND_AFTER != 0)          # check if EXPAND_FLAG flag is on
+            to = [to + LINES_AFTER, contents_lines_size].min # make sure expand after does not go out of bound
+          end
+
+          from = contents_lines_size if from > contents_lines_size   #if "from" is out of the content top bound
+          # to   = contents_lines_size if to > contents_lines_size   #if "to" is out of  the content top bound
+        else
+          #no expand show the one liner solely
+        end
+      end
+
+# 2016-10-04
 =begin
     if to-from > MAX_LINES && !one_liner  #if exceed the MAX_LINES limit correct unless range was produced by one_liner which it expand setting will allow exceeding the line limit
       truncated = true
@@ -115,70 +113,71 @@ Onebox::Mixins::GitBlobOnebox::InstanceMethods.module_eval do
     end
 =end
 
-    {:from               => from,                 #calculated from
-     :from_minus_one    => from-1,                #used for getting currect ol>li numbering with css used in template
-     :to                 => to,                   #calculated to
-     :one_liner          => one_liner,            #boolean if a one-liner
-     :selected_one_liner => @selected_one_liner,  #if a one liner is provided we create a reference for it.
-     :range_provided     => range_provided,       #boolean if range provided
-     :truncated          => truncated}
-  end
+      {:from               => from,                 #calculated from
+       :from_minus_one    => from-1,                #used for getting currect ol>li numbering with css used in template
+       :to                 => to,                   #calculated to
+       :one_liner          => one_liner,            #boolean if a one-liner
+       :selected_one_liner => @selected_one_liner,  #if a one liner is provided we create a reference for it.
+       :range_provided     => range_provided,       #boolean if range provided
+       :truncated          => truncated}
+    end
 
-  def raw
-	return @raw if @raw
+    def raw
+      return @raw if @raw
 
-	m = @url.match(/github\.com\/(?<user>[^\/]+)\/(?<repo>[^\/]+)\/blob\/(?<sha1>[^\/]+)\/(?<file>[^#]+)(#(L(?<from>[^-]*)(-L(?<to>.*))?))?/mi)
+      m = @url.match(/github\.com\/(?<user>[^\/]+)\/(?<repo>[^\/]+)\/blob\/(?<sha1>[^\/]+)\/(?<file>[^#]+)(#(L(?<from>[^-]*)(-L(?<to>.*))?))?/mi)
 
-	if m
-	  from = /\d+/.match(m[:from])   #get numeric should only match a positive interger
-	  to   = /\d+/.match(m[:to])     #get numeric should only match a positive interger
+      if m
+        from = /\d+/.match(m[:from])   #get numeric should only match a positive interger
+        to   = /\d+/.match(m[:to])     #get numeric should only match a positive interger
 
-	  @file = m[:file]
-	  @lang = Onebox::FileTypeFinder.from_file_name(m[:file])
-	  # 2018-01-23
-	  # 1) https://developer.github.com/changes/2014-04-25-user-content-security
-	  # 2) «`raw.github.com` does not redirect to `raw.githubusercontent.com` for me»:
-	  # https://github.com/processing/processing-docs/issues/532
-	  # 3) «No traffic limits or throttling»
-	  # https://rawgit.com
-	  # https://github.com/rgrove/rawgit
-	  cdnRawGit = 'cdn.rawgit.com'
-	  cdnGitHub = 'raw.githubusercontent.com'
-	  io = open("https://#{cdnGitHub}/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout)
-	  contents = io.read
-	  # 2018-01-24 https://stackoverflow.com/a/4795782
-	  io.close
+        @file = m[:file]
+        @lang = Onebox::FileTypeFinder.from_file_name(m[:file])
+        # 2018-01-23
+        # 1) https://developer.github.com/changes/2014-04-25-user-content-security
+        # 2) «`raw.github.com` does not redirect to `raw.githubusercontent.com` for me»:
+        # https://github.com/processing/processing-docs/issues/532
+        # 3) «No traffic limits or throttling»
+        # https://rawgit.com
+        # https://github.com/rgrove/rawgit
+        cdnRawGit = 'cdn.rawgit.com'
+        cdnGitHub = 'raw.githubusercontent.com'
+        io = open("https://#{cdnGitHub}/#{m[:user]}/#{m[:repo]}/#{m[:sha1]}/#{m[:file]}", read_timeout: timeout)
+        contents = io.read
+        # 2018-01-24 https://stackoverflow.com/a/4795782
+        io.close
 
-	  contents_lines = contents.lines           #get contents lines
-	  contents_lines_size = contents_lines.size #get number of lines
+        contents_lines = contents.lines           #get contents lines
+        contents_lines_size = contents_lines.size #get number of lines
 
-	  cr = calc_range(m, contents_lines_size)    #calculate the range of lines for output
-	  selected_one_liner = cr[:selected_one_liner] #if url is a one-liner calc_range will return it
-	  from           = cr[:from]
-	  to             = cr[:to]
-	  @truncated     = cr[:truncated]
-	  range_provided = cr[:range_provided]
-	  @cr_results = cr
+        cr = calc_range(m, contents_lines_size)    #calculate the range of lines for output
+        selected_one_liner = cr[:selected_one_liner] #if url is a one-liner calc_range will return it
+        from           = cr[:from]
+        to             = cr[:to]
+        @truncated     = cr[:truncated]
+        range_provided = cr[:range_provided]
+        @cr_results = cr
 
-	  if range_provided       #if a range provided (single line or more)
-		if SHOW_LINE_NUMBER
-		  lines_result = line_number_helper(contents_lines[(from - 1)..(to - 1)], from, selected_one_liner)  #print code with prefix line numbers in case range provided
-		  contents = lines_result[:output]
-		  @selected_lines_array = lines_result[:array]
-		else
-		  contents = contents_lines[(from - 1)..(to - 1)].join()
-		end
+        if range_provided       #if a range provided (single line or more)
+        if SHOW_LINE_NUMBER
+          lines_result = line_number_helper(contents_lines[(from - 1)..(to - 1)], from, selected_one_liner)  #print code with prefix line numbers in case range provided
+          contents = lines_result[:output]
+          @selected_lines_array = lines_result[:array]
+        else
+          contents = contents_lines[(from - 1)..(to - 1)].join()
+        end
 
-	  else
-		contents = contents_lines[(from - 1)..(to - 1)].join()
-	  end
+        else
+        contents = contents_lines[(from - 1)..(to - 1)].join()
+        end
 
-	  if contents.length > MAX_CHARS    #truncate content chars to limits
-		contents = contents[0..MAX_CHARS]
-		@truncated = true
-	  end
+        if contents.length > MAX_CHARS    #truncate content chars to limits
+        contents = contents[0..MAX_CHARS]
+        @truncated = true
+        end
 
-	  @raw = contents
-	end
+        @raw = contents
+      end
+    end
   end
 end
