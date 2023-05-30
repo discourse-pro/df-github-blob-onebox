@@ -48,7 +48,7 @@ after_initialize do
 end
 
 # 2023-05-26
-require 'lib/onebox/mixins/git_blob_onebox'
+require './lib/onebox/mixins/git_blob_onebox'
 Onebox::Engine::GithubBlobOnebox.InstanceMethods.module_eval do
   # 2018-01-22
   alias_method :core__initialize, :initialize
